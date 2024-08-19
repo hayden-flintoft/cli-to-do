@@ -4,7 +4,7 @@ export async function up(knex) {
     .createTable('todos', function (table) {
       table.increments('id')
       table.string('task').notNullable()
-      table.integer('completed')=0
+      table.integer('completed').defaultTo(0)
     })
     .then(() => {
       console.log('todos table created successfully')

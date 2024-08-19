@@ -31,6 +31,20 @@ export async function updateTodo(id, task, db = connection) {
   return updatedTask
 }
 
+export async function toggleCompleted(id, db = connection) {
+  const [task] = await db('todos').where({ id: id }).select('completed')
+  const completed = task.completed ? 0 : 1
+
+  const [updatedTask] = await db('todos').where({ id: id }).update(
+    {
+      completed: completed,
+    },
+    ['id', 'completed'],
+  )
+
+  return updatedTask
+}
+
 export async function close() {
   db.destroy()
 }

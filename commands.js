@@ -1,4 +1,11 @@
-import { getTodos, deleteTodo, insertTodo, close, updateTodo } from './db.js'
+import {
+  getTodos,
+  deleteTodo,
+  insertTodo,
+  close,
+  updateTodo,
+  toggleCompleted,
+} from './db.js'
 
 export async function list() {
   try {
@@ -44,6 +51,21 @@ export async function createRecord(task) {
 export async function updateRecord(id, task) {
   try {
     const updated = await updateTodo(id, task)
+    if (updated) {
+      console.log(`${id} has been updated.`)
+    } else {
+      console.log(`${id} couldnt be updated.`)
+    }
+  } catch (err) {
+    logError(err)
+  } finally {
+    close()
+  }
+}
+
+export async function toggleCompleteRecord(id) {
+  try {
+    const updated = await toggleCompleted(id)
     if (updated) {
       console.log(`${id} has been updated.`)
     } else {

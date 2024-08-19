@@ -48,10 +48,18 @@ switch (cmd) {
     } else if (!arg2) {
       console.log('No valid task has been provided in argument 2.')
     } else {
-      await commands.updateRecord(arg1, arg2)
+      await commands.updateRecord(taskId, arg2)
     }
     break
 
+  case 'check':
+  case 'c':
+    if (!taskId || isNaN(taskId)) {
+      console.log('No valid ID has been provided. Please enter a number.')
+    } else {
+      await commands.toggleCompleteRecord(taskId)
+    }
+    break
   default:
     console.log(`I don't understand that command: ${cmd}`)
 }
