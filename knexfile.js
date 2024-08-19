@@ -34,6 +34,19 @@ export default {
     },
   },
 
+  //   test: {
+  //     client: 'sqlite3',
+  //     connection: {
+  //       filename: ':memory:'
+  //     },
+  //     migrations: {},
+  //     seeds: {
+  //       // directory: Path.join(__filename)
+
+  //     },
+  //     useNullAsDefault: true
+  // }
+
   production: {
     client: 'postgresql',
     connection: {

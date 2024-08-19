@@ -1,4 +1,4 @@
-import { getTodos, deleteTodo, close } from './db.js'
+import { getTodos, deleteTodo, insertTodo, close, updateTodo } from './db.js'
 
 export async function list() {
   try {
@@ -26,7 +26,37 @@ export async function deleteRecord(id) {
   }
 }
 
-function printTodos(todos) {
+export async function createRecord(task) {
+  try {
+    const created = await insertTodo(task)
+    if (created) {
+      console.log(`${task} has been created.`)
+    } else {
+      console.log(`${task} couldnt be created.`)
+    }
+  } catch (err) {
+    logError(err)
+  } finally {
+    close()
+  }
+}
+
+export async function updateRecord(id, task) {
+  try {
+    const updated = await updateTodo(id, task)
+    if (updated) {
+      console.log(`${id} has been updated.`)
+    } else {
+      console.log(`${id} couldnt be updated.`)
+    }
+  } catch (err) {
+    logError(err)
+  } finally {
+    close()
+  }
+}
+
+async function printTodos(todos) {
   todos.forEach((todo) => {
     console.info(`${todo.id}: ${todo.task}`)
   })

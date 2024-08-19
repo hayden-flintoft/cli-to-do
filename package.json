@@ -35,13 +35,14 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.34.1",
     "prettier": "^3.2.5",
-    "vitest": "^1.2.0"
+    "vitest": "^1.6.0"
   },
   "prettier": {
     "semi": false,
     "singleQuote": true
   },
   "dependencies": {
+    "@vitest/coverage-v8": "^2.0.5",
     "knex": "^3.1.0",
     "sqlite3": "^5.1.7"
   }
