@@ -4,8 +4,15 @@ import knex from 'knex'
 const db = knex(knexfile.development)
 const connection = db
 
-export async function getTodos() {
-  return db('todos').select()
+export function getTodos(filter = {}) {
+  const query = db('todos').select()
+  // console.log('Initial query:', query.toString())
+  if (filter.completed !== undefined) {
+    query.where('completed', filter.completed)
+    // console.log('Modified query:', query.toString())
+  }
+
+  return query
 }
 
 // Your DB functions go here
@@ -16,7 +23,7 @@ export async function deleteTodo(id, db = connection) {
 
 export async function insertTodo(task, db = connection) {
   const [newTaskId] = await db('todos').insert({ task }).returning('id')
-  console.log(newTaskId)
+  // console.log(newTaskId)
   return newTaskId
 }
 
@@ -46,5 +53,5 @@ export async function toggleCompleted(id, db = connection) {
 }
 
 export async function close() {
-  db.destroy()
+  await db.destroy()
 }

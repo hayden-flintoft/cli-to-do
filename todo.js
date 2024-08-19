@@ -1,19 +1,30 @@
 #!/usr/bin/env node
 import * as commands from './commands.js'
 
-const userInputs = process.argv
-const cmd = userInputs[2] // This is the first relevant element in a provided command input. In this context it will be list, lst, del or delete.
-const arg1 = userInputs[3] // This is the second relevant element which in this case would include an id for operating on.
-const arg2 = userInputs[4] // Used for updating task
+const userInputs = process.argv.slice(2)
+const cmd = userInputs[0] // This is the first relevant element in a provided command input. In this context it will be list, lst, del or delete.
+const arg1 = userInputs[1] // This is the second relevant element which in this case would include an id for operating on.
+const arg2 = userInputs[2] // Used for updating task
 
 // Convert arg1 to a number
 const taskId = Number(arg1)
+
+const flags = {
+  completed: userInputs.includes('-completed'),
+  incomplete: userInputs.includes('-incomplete'),
+}
 
 switch (cmd) {
   case 'list':
   case 'lst':
   case 'l':
-    await commands.list()
+    if (flags.completed) {
+      await commands.list({ filter: 'completed' })
+    } else if (flags.incomplete) {
+      await commands.list({ filter: 'incomplete' })
+    } else {
+      await commands.list()
+    }
     break
 
   case 'remove':

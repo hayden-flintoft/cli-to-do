@@ -7,9 +7,22 @@ import {
   toggleCompleted,
 } from './db.js'
 
-export async function list() {
+export async function list({ filter } = {}) {
   try {
-    const todos = await getTodos()
+    let filterOptions = {}
+
+    if (filter === 'completed') {
+      filterOptions = { completed: 1 }
+    } else if (filter === 'incomplete') {
+      filterOptions = { completed: 0 }
+    }
+
+    // console.log('Filter passed:', filterOptions)
+
+    const todos = await getTodos(filterOptions)
+
+    // console.log('Todos fetched:', todos)
+
     printTodos(todos)
   } catch (err) {
     logError(err)
@@ -29,7 +42,7 @@ export async function deleteRecord(id) {
   } catch (err) {
     logError(err)
   } finally {
-    close()
+    list()
   }
 }
 
@@ -44,7 +57,7 @@ export async function createRecord(task) {
   } catch (err) {
     logError(err)
   } finally {
-    close()
+    list()
   }
 }
 
@@ -59,7 +72,7 @@ export async function updateRecord(id, task) {
   } catch (err) {
     logError(err)
   } finally {
-    close()
+    list()
   }
 }
 
@@ -74,13 +87,14 @@ export async function toggleCompleteRecord(id) {
   } catch (err) {
     logError(err)
   } finally {
-    close()
+    list()
   }
 }
 
 async function printTodos(todos) {
   todos.forEach((todo) => {
-    console.info(`${todo.id}: ${todo.task}`)
+    const status = todo.completed ? '[✓]' : '[ ]'
+    console.info(`${status}: ${todo.id}: ${todo.task}`)
   })
 }
 
