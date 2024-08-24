@@ -9,12 +9,6 @@ export default {
     connection: {
       filename: './dev.sqlite3',
     },
-    migrations: {
-      directory: './migrations',
-    },
-    seeds: {
-      directory: './seeds',
-    },
     useNullAsDefault: true,
   },
 
@@ -33,19 +27,6 @@ export default {
       tableName: 'knex_migrations',
     },
   },
-
-  //   test: {
-  //     client: 'sqlite3',
-  //     connection: {
-  //       filename: ':memory:'
-  //     },
-  //     migrations: {},
-  //     seeds: {
-  //       // directory: Path.join(__filename)
-
-  //     },
-  //     useNullAsDefault: true
-  // }
 
   production: {
     client: 'postgresql',

@@ -6,10 +6,8 @@ const connection = db
 
 export function getTodos(filter = {}) {
   const query = db('todos').select()
-  // console.log('Initial query:', query.toString())
   if (filter.completed !== undefined) {
     query.where('completed', filter.completed)
-    // console.log('Modified query:', query.toString())
   }
 
   return query
