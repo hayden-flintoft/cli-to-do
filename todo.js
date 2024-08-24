@@ -1,109 +1,23 @@
 #!/usr/bin/env node
 import * as commands from './commands.js'
 
-const userInputs = process.argv.slice(2).map(sanitiseInput)
-const cmd = userInputs[0] // This is the first relevant element in a provided command input. In this context it will be list, lst, del or delete.
-const arg1 = userInputs[1] // This is the second relevant element which in this case would include an id for operating on.
-const arg2 = userInputs[2] // Used for updating task
+function main() {
+  const userInputs = process.argv.slice(2).map(sanitiseInput)
+  const cmd = parseCommand(userInputs)
+  const flags = parseFlags(userInputs)
+  const taskId = parseTaskId(userInputs)
+  const task = parseTask(userInputs)
 
-// Convert arg1 to a number
-const taskId = Number(arg1)
+  handleUnknownFlags(flags.unknownFlags)
 
-const flags = {
-  '-completed': userInputs.includes('-completed'),
-  '-incomplete': userInputs.includes('-incomplete'),
-  '-h': userInputs.includes('-h'),
-  '-help': userInputs.includes('-help'),
-}
-
-// TODO: Logic to handle multiple words without quotes.
-// TODO: Convert case to Pascal
-// TODO: Testing
-
-const inputFlags = userInputs.filter((input) => input.startsWith('-'))
-const unknownFlags = inputFlags.filter(
-  (flag) => !Object.keys(flags).includes(flag),
-)
-
-if (unknownFlags.length > 0) {
-  console.error(`Unknown flag(s) detected: ${unknownFlags.join(', ')}`)
-  console.error(`Use -h, or -help, to display help.`)
-  process.exit(1)
-}
-
-if (flags['-h'] || flags['-help']) {
-  commands.displayHelp(cmd)
-} else {
-  switch (cmd) {
-    case 'list':
-    case 'lst':
-    case 'l':
-      if (flags['-completed']) {
-        await commands.list({ filter: 'completed' })
-      } else if (flags['-incomplete']) {
-        await commands.list({ filter: 'incomplete' })
-      } else {
-        await commands.list()
-      }
-      break
-
-    case 'remove':
-    case 'delete':
-    case 'del':
-    case 'd':
-      if (!taskId || isNaN(taskId)) {
-        console.log('No valid ID has been provided. Please enter a number.')
-      } else {
-        await commands.deleteRecord(arg1)
-      }
-
-      break
-
-    case 'add':
-    case 'create':
-    case 'insert':
-    case 'ins':
-    case 'i':
-      if (!arg1) {
-        console.log('No task has been provided.')
-      } else {
-        await commands.createRecord(arg1)
-      }
-
-      break
-
-    case 'update':
-    case 'upd':
-    case 'up':
-    case 'u':
-      if (!taskId || isNaN(taskId)) {
-        console.log('No valid ID has been provided. Please enter a number.')
-      } else if (!arg2) {
-        console.log('No valid task has been provided in argument 2.')
-      } else {
-        await commands.updateRecord(taskId, arg2)
-      }
-
-      break
-
-    case 'check':
-    case 'c':
-      if (!taskId || isNaN(taskId)) {
-        console.log('No valid ID has been provided. Please enter a number.')
-      } else {
-        await commands.toggleCompleteRecord(taskId)
-      }
-
-      break
-    case 'help':
-      commands.displayHelp('general')
-      break
-    default:
-      console.log(`I don't understand that command: ${cmd}`)
-      commands.displayHelpNag('general')
+  if (flags.help) {
+    commands.displayHelp(cmd)
+  } else {
+    executeCommand(cmd, flags, taskId, task)
   }
 }
 
+// Sanitize input
 function sanitiseInput(input) {
   return input
     .replace(/[\r\n]/g, ' ')
@@ -111,4 +25,145 @@ function sanitiseInput(input) {
     .trim()
 }
 
+// Extract and validate command
+function parseCommand(inputs) {
+  return inputs[0]
+}
 
+function parseFlags(inputs) {
+  const knownFlags = ['-completed', '-incomplete', '-h', '-help']
+  const inputFlags = inputs.filter((input) => input.startsWith('-'))
+  const flags = {
+    '-completed': inputFlags.includes('-completed'),
+    '-incomplete': inputFlags.includes('-incomplete'),
+    help: inputFlags.includes('-h') || inputFlags.includes('-help'),
+    unknownFlags: inputFlags.filter((flag) => !knownFlags.includes(flag)),
+  }
+  return flags
+}
+
+// Handle multi-word tasks without requiring quotes
+function parseTask(inputs) {
+  const commandAndFlagsCount = 1 + parseFlags(inputs).unknownFlags.length
+  const taskArray = inputs.slice(commandAndFlagsCount).join(' ')
+  return convertToSentenceCase(taskArray)
+}
+
+// Convert task case to sentence case
+function convertToSentenceCase(task) {
+  return task.charAt(0).toUpperCase() + task.slice(1).toLowerCase()
+}
+
+// Parse and validate task ID (if applicable)
+function parseTaskId(inputs) {
+  const taskId = Number(inputs[1])
+  return isNaN(taskId) ? null : taskId
+}
+
+// Handle unknown flags
+function handleUnknownFlags(unknownFlags) {
+  if (unknownFlags.length > 0) {
+    console.error(`Unknown flag(s) detected: ${unknownFlags.join(', ')}`)
+    console.error('Use -h or -help to display help.')
+    process.exit(1)
+  }
+}
+
+// executeCommand will go here
+async function executeCommand(cmd, flags, taskId, task) {
+  try {
+    switch (cmd) {
+      case 'list':
+      case 'lst':
+      case 'l':
+        await handleListCommand(flags)
+        break
+
+      case 'remove':
+      case 'delete':
+      case 'del':
+      case 'd':
+        await handleDeleteCommand(taskId)
+        break
+
+      case 'add':
+      case 'create':
+      case 'insert':
+      case 'ins':
+      case 'i':
+        await handleAddCommand(task)
+        break
+
+      case 'update':
+      case 'upd':
+      case 'up':
+      case 'u':
+        handleUpdateCommand(taskId, task)
+        break
+
+      case 'check':
+      case 'c':
+        handleCheckCommand(taskId)
+        break
+
+      case 'help':
+        commands.displayHelp('general')
+        break
+
+      default:
+        console.log(`I don't understand that command: ${cmd}`)
+        commands.displayHelpNag('general')
+    }
+  } catch (error) {
+    console.error(`An error occurred: ${error.message}`)
+    commands.displayHelp(cmd)
+    process.exit(1)
+  }
+}
+
+// Command handlers
+async function handleListCommand(flags) {
+  if (flags['-completed']) {
+    await commands.list({ filter: 'completed' })
+  } else if (flags['-incomplete']) {
+    await commands.list({ filter: 'incomplete' })
+  } else {
+    await commands.list()
+  }
+}
+
+async function handleDeleteCommand(taskId) {
+  if (!taskId) {
+    throw new Error('No valid ID has been provided. Please enter a number.')
+  } else {
+    await commands.deleteRecord(taskId)
+  }
+}
+
+async function handleAddCommand(task) {
+  if (!task) {
+    throw new Error('No task has been provided.')
+  } else {
+    await commands.createRecord(task)
+  }
+}
+
+async function handleUpdateCommand(taskId, task) {
+  if (!taskId) {
+    throw new Error('No valid ID has been provided. Please enter a number.')
+  } else if (!task) {
+    throw new Error('No valid task has been provided.')
+  } else {
+    await commands.updateRecord(taskId, task)
+  }
+}
+
+async function handleCheckCommand(taskId) {
+  if (!taskId) {
+    throw new Error('No valid ID has been provided. Please enter a number.')
+  } else {
+    await commands.toggleCompleteRecord(taskId)
+  }
+}
+
+main()

@@ -122,11 +122,11 @@ Commands:
   add <task>:                       Add a new task
   delete <id>:                      Delete a task by ID
   update <id> <task>:               Update a task by ID
-  check, c <id>:                    Toggle the completion status of a task by ID
+  check <id>:                    Toggle the completion status of a task by ID
   help:                             Show this help message 
 
 Options/Flags:
-  -h, -help, -?:                    Show help for a specific command
+  -h, -help:                        Show help for a specific command
   -completed:                       Show only completed tasks
   -incomplete:                      Show only incomplete tasks
 
@@ -136,7 +136,7 @@ You can use any aliases in place of a command.
  add:                               create, insert, ins, i
  delete:                            remove, del, d
  update:                            upd, up, u
- check:                              c
+ check:                             c
 
 Examples:
   ./todo.js list:                   List all tasks
@@ -148,32 +148,64 @@ Examples:
   ./todo.js check 1:                Toggle the completion status of task with ID 1
 `,
   list: `
+Function: List
+Command:  list
+Aliases:  lst
+          l
+
+Description: List all tasks
+ 
 Usage: ./todo.js list [options]
 
 Options:
   -completed    List only completed tasks
   -incomplete   List only incomplete tasks
-  -h, -help, -? Show this help message
+  -h, -help     Show this help message
 `,
   add: `
+Function: Add Task
+Command:  add <task>
+Aliases:  create
+          insert
+          ins
+          i
+
+Description: Add a new task
+ 
 Usage: ./todo.js add <task>
 
 Arguments:
   <task>  The task description
 
 Options:
-  -h, -help, -? Show this help message
+  -h, -help Show this help message
 `,
   remove: `
+Function: Remove Task
+Command:  remove <id>
+Aliases:  remove
+          del
+          d
+
+Description: Delete a task by ID
+ 
 Usage: ./todo.js remove <id>
 
 Arguments:
   <id>    The ID of the task to remove
 
 Options:
-  -h, -help, -? Show this help message
+  -h, -help Show this help message
 `,
   update: `
+Function: Update Task
+Command:  update <id> <task>
+Aliases:  upd
+          up
+          u
+
+Description: Update a task by ID
+ 
 Usage: ./todo.js update <id> <task>
 
 Arguments:
@@ -181,19 +213,25 @@ Arguments:
   <task>  The new task description
 
 Options:
-  -h, -help, -? Show this help message
+  -h, -help, Show this help message
 `,
   check: `
+Function: Toggle Completion Status
+Command:  check <id>
+Aliases:  c
+
+Description: Toggle the completion status of a task by ID
+ 
 Usage: ./todo.js check <id>
 
 Arguments:
   <id>    The ID of the task to toggle completion status
 
 Options:
-  -h, -help, -? Show this help message
+  -h, -help Show this help message
 `,
   input: `
-Did you know you can ask for help using help for a complete list or by adding any of the following flags at the end of an incomplete command using any of the following flags: -h, -help, -?
+Did you know you can ask for help using help for a complete list or by adding any of the following flags at the end of an incomplete command using any of the following flags: -h, -help
 `,
 }
 
