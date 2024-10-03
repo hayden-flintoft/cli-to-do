@@ -1,5 +1,5 @@
 {
-  "name": "knex-todo-cli",
+  "name": "CLI-To-Do",
   "type": "module",
   "version": "1.0.0",
   "description": "Command-line todo app using Knex.",
